@@ -13,21 +13,47 @@ class File:
 Task 1
 """
 def leafFiles(files: list[File]) -> list[str]:
-    return []
+    parent_set = set([file.parent for file in files])
+    files_set = set([file.id for file in files])
+    leaf_set = files_set - parent_set
+    return [file.name for file in files if file.id in leaf_set]
 
 
 """
 Task 2
 """
 def kLargestCategories(files: list[File], k: int) -> list[str]:
-    return []
+    category_dict = {}
+    for file in files:
+        for category in file.categories:
+            category_dict[category] = category_dict.get(category, 0) + 1
+    category_dict = {category: value for category, value in sorted(category_dict.items(), key=lambda item: item[1])}
+    return list(category_dict.keys())[:-4:-1]
 
 
 """
 Task 3
 """
+def recurSearchSize(file, child_files_dict) -> int:
+    if file.id not in child_files_dict:
+        return file.size
+
+    total_sum = 0
+    for file in child_files_dict[file.id]:
+        total_sum += recurSearchSize(file, child_files_dict)
+    return total_sum
+
+
 def largestFileSize(files: list[File]) -> int:
-    return 0
+    child_files = {}
+
+    for file in files:
+        child_files.setdefault(file.parent, []).append(file)
+
+    max_size = []
+    for file in files:
+        max_size.append(recurSearchSize(file, child_files))
+    return max(max_size)
 
 
 if __name__ == '__main__':
